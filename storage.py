@@ -19,9 +19,15 @@ logger = logging.getLogger(__name__)
 FIELDNAMES = [
     "created_at",
     "source",
+    "lead_status",
     "name",
     "phone",
     "contact_time",
+    "assigned_to",
+    "next_action",
+    "next_contact_at",
+    "call_result",
+    "admin_comment",
     "concern",
     "score",
     "risk_label",
@@ -43,12 +49,19 @@ def _answer_labels(answers: list, idx: int) -> str:
 def _build_row(user_data: dict, user) -> dict:
     answers = user_data.get("answers", [])
     risk = user_data.get("risk", {})
+    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return {
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "created_at": created_at,
         "source": SOURCE_TAG,
+        "lead_status": "Новая заявка",
         "name": user_data.get("name", "—"),
         "phone": user_data.get("phone", "—"),
         "contact_time": user_data.get("time", "—"),
+        "assigned_to": "",
+        "next_action": "Позвонить / написать",
+        "next_contact_at": "",
+        "call_result": "",
+        "admin_comment": "",
         "concern": user_data.get("concern") or "—",
         "score": user_data.get("score", 0),
         "risk_label": risk.get("label", "—"),
@@ -95,10 +108,25 @@ def _save_to_google_sheet(row: dict) -> None:
             cols=len(FIELDNAMES),
         )
 
-    if not worksheet.row_values(1):
+    headers = worksheet.row_values(1)
+    if not headers:
         worksheet.append_row(FIELDNAMES, value_input_option="USER_ENTERED")
+    elif headers != FIELDNAMES:
+        worksheet.update(
+            range_name=f"A1:{_column_name(len(FIELDNAMES))}1",
+            values=[FIELDNAMES],
+            value_input_option="USER_ENTERED",
+        )
 
     worksheet.append_row([row.get(field, "") for field in FIELDNAMES], value_input_option="USER_ENTERED")
+
+
+def _column_name(index: int) -> str:
+    name = ""
+    while index:
+        index, remainder = divmod(index - 1, 26)
+        name = chr(65 + remainder) + name
+    return name
 
 
 def save_lead(user_data: dict, user) -> Path:

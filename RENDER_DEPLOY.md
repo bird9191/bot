@@ -58,7 +58,7 @@ python3 -c "import json; print(json.dumps(json.load(open('/Users/magomed199/Down
 2. Должна быть строка `Application started`.
 3. Напиши боту `/start`.
 4. Пройди тест и оставь заявку.
-5. Проверь вкладку `Лиды` в Google Sheets.
+5. Проверь вкладку `Лиды` в Google Sheets. Новые заявки должны появляться со статусом `Новая заявка`.
 
 ## Локальный бот
 

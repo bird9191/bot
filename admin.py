@@ -34,6 +34,8 @@ async def notify_admin(context: ContextTypes.DEFAULT_TYPE, user) -> None:
         f"💬 <b>Доп. информация:</b> {html_escape(ud.get('concern') or '—')}\n\n"
         f"👤 <b>Telegram:</b> @{html_escape(user.username or '—')} (ID: <code>{html_escape(user.id)}</code>)\n"
         f"🏷 <b>Тег:</b> {SOURCE_TAG}\n\n"
+        f"🧾 <b>CRM:</b> заявка добавлена в Google Sheets, вкладка «Лиды».\n"
+        f"Статус по умолчанию: <b>Новая заявка</b>\n\n"
         f"📞 <b>Скрипт первого звонка:</b>\n"
         f"<i>«Здравствуйте, меня зовут ___, Clean Clinic. Вы прошли тест "
         f"\"Проверь себя\" по QR-коду. У вас в ответах отразились признаки "
