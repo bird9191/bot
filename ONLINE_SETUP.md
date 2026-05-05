@@ -30,6 +30,12 @@ GOOGLE_SHEET_NAME=Лиды
 GOOGLE_SERVICE_ACCOUNT_FILE=/полный/путь/к/service-account.json
 ```
 
+Чтобы применить CRM-оформление к листу `Лиды`, выполни:
+
+```bash
+python format_sheet.py
+```
+
 Для сервера удобнее использовать переменную одной строкой:
 
 ```env
