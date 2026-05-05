@@ -1,61 +1,66 @@
-# Онлайн-запуск Clean Clinic Bot
+# Clean Clinic Bot Deployment
 
-## Как будет работать
+## Overview
 
-Бот запускается на сервере 24/7 через `python bot.py`.
-QR можно вести прямо на ссылку Telegram-бота: `https://t.me/<username_бота>`.
+The bot runs as a long-lived Python process:
 
-Заявки сохраняются в Google Sheets, если заданы переменные `GOOGLE_SHEET_ID` и
-`GOOGLE_SERVICE_ACCOUNT_JSON`. Локальный `leads.csv` остается запасной копией.
+```bash
+python bot.py
+```
 
-## Переменные окружения
+QR traffic can point directly to the Telegram bot URL:
 
-Обязательные:
+```text
+https://t.me/Tests2609bot
+```
 
-- `BOT_TOKEN` — токен бота от BotFather.
+Leads are saved to Google Sheets when Google Sheets variables are configured. A local `leads.csv` file is also used as a backup.
 
-Желательные:
+## Environment Variables
 
-- `ADMIN_CHAT_ID` — Telegram ID администратора или группы для уведомлений.
-- `WA_LINK` — ссылка WhatsApp, например `https://wa.me/77001234567`.
-- `GOOGLE_SHEET_ID` — ID Google-таблицы из URL.
-- `GOOGLE_SHEET_NAME` — название листа, по умолчанию `Лиды`.
-- `GOOGLE_SERVICE_ACCOUNT_JSON` — JSON service account одной строкой.
+Required:
 
-## Локальный запуск
+- `BOT_TOKEN` — Telegram bot token from BotFather.
 
-1. Скопируй `.env.example` в `.env`.
-2. Вставь токен из BotFather в `BOT_TOKEN`.
-3. Укажи ссылку WhatsApp в `WA_LINK`.
-4. Установи зависимости: `pip install -r requirements.txt`.
-5. Запусти бота: `python bot.py`.
-6. Напиши боту `/id` и скопируй `Chat ID` в `ADMIN_CHAT_ID`.
-7. Перезапусти бота, чтобы уведомления администратору начали приходить.
+Recommended:
+
+- `ADMIN_CHAT_ID` — Telegram admin or group chat ID.
+- `ADMIN_CHAT_IDS` — comma-separated admin IDs for multiple admins.
+- `WA_LINK` — WhatsApp link.
+- `GOOGLE_SHEET_ID` — Google Sheet ID from the URL.
+- `GOOGLE_SHEET_NAME` — worksheet name, default: `Лиды`.
+- `GOOGLE_SERVICE_ACCOUNT_JSON` — Google service account JSON as one line.
+
+## Local Run
+
+1. Copy `.env.example` to `.env`.
+2. Fill in `BOT_TOKEN`.
+3. Fill in `WA_LINK`.
+4. Install dependencies: `pip install -r requirements.txt`.
+5. Start the bot: `python bot.py`.
+6. Send `/id` to the bot and put the returned `Chat ID` into `ADMIN_CHAT_ID`.
+7. Restart the bot.
 
 ## Google Sheets
 
-1. Создай Google Cloud project.
-2. Включи Google Sheets API.
-3. Создай Service Account и JSON key.
-4. Создай Google Sheet.
-5. Поделись таблицей с email service account с правом Editor.
-6. На сервере добавь JSON ключ в `GOOGLE_SERVICE_ACCOUNT_JSON`.
+1. Create a Google Cloud project.
+2. Enable Google Sheets API.
+3. Create a Service Account and JSON key.
+4. Create a Google Sheet.
+5. Share the sheet with the service account email as Editor.
+6. Set `GOOGLE_SERVICE_ACCOUNT_JSON` on the server.
 
-## Railway
+## Hosting
 
-1. Залей проект в GitHub.
-2. Создай Railway project из GitHub repo.
-3. Start command: `python bot.py`.
-4. Добавь переменные окружения.
-5. Deploy.
+Any host that can run a persistent Python process is suitable:
 
-## Render
+- Render Background Worker
+- Railway
+- VPS
 
-Для Telegram polling нужен Background Worker.
+Use:
 
-1. Залей проект в GitHub.
-2. Создай Background Worker.
-3. Build command: `pip install -r requirements.txt`.
-4. Start command: `python bot.py`.
-5. Добавь переменные окружения.
-6. Deploy.
+```text
+Build command: pip install -r requirements.txt
+Start command: python bot.py
+```

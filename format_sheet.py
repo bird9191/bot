@@ -80,7 +80,6 @@ def main() -> None:
     worksheet = spreadsheet.worksheet(GOOGLE_SHEET_NAME)
     _format_leads_sheet(spreadsheet, worksheet)
     _format_stats_sheet(spreadsheet)
-    print("CRM formatting applied.")
 
 
 def _format_leads_sheet(spreadsheet, worksheet) -> None:

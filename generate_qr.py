@@ -18,8 +18,6 @@ def main() -> None:
     qr.make(fit=True)
     image = qr.make_image(fill_color="#0F3D49", back_color="white")
     image.save(OUTPUT_PATH)
-    print(f"QR saved to {OUTPUT_PATH}")
-    print(BOT_URL)
 
 
 if __name__ == "__main__":

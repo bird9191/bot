@@ -1,65 +1,57 @@
 # Render Background Worker
 
-## Важно
+## Service
 
-Render Background Worker работает 24/7, но у Render нет бесплатного плана для background workers. В `render.yaml` указан минимальный платный план `starter`.
+`render.yaml` defines a Background Worker for the Telegram bot.
 
-## Что уже настроено
+## Configuration
 
-- `render.yaml` описывает Background Worker.
-- Runtime: Python.
-- Build Command: `pip install -r requirements.txt`.
-- Start Command: `python bot.py`.
-- Google Sheet ID уже прописан.
-- Секреты не хранятся в `render.yaml`; Render попросит ввести их в Dashboard.
+- Runtime: Python
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `python bot.py`
+- Google Sheet ID is included in `render.yaml`
+- Secrets are configured in the Render Dashboard
 
-## Переменные окружения на Render
-
-В Render нужно указать:
+## Environment Variables
 
 ```env
-BOT_TOKEN=новый_токен_бота
+BOT_TOKEN=telegram_bot_token
 ADMIN_CHAT_ID=5524476590
 WA_LINK=https://wa.me/77001234567
-GOOGLE_SERVICE_ACCOUNT_JSON=JSON_SERVICE_ACCOUNT_ОДНОЙ_СТРОКОЙ
+GOOGLE_SERVICE_ACCOUNT_JSON=service_account_json_as_one_line
 ```
 
-Если нужно несколько админов:
+Optional multiple admins:
 
 ```env
 ADMIN_CHAT_IDS=5524476590,111111111,222222222
 ```
 
-## Как получить GOOGLE_SERVICE_ACCOUNT_JSON одной строкой
+## GOOGLE_SERVICE_ACCOUNT_JSON
 
-На локальном компьютере выполни команду, заменив путь на путь к скачанному JSON-ключу:
+Convert the downloaded service account JSON file to one line:
 
 ```bash
 python3 -c "import json; print(json.dumps(json.load(open('/path/to/service-account.json'))))"
 ```
 
-Скопируй весь вывод и вставь в Render как значение `GOOGLE_SERVICE_ACCOUNT_JSON`.
+Use the command output as the value of `GOOGLE_SERVICE_ACCOUNT_JSON`.
 
-Не отправляй этот JSON в чат и не добавляй его в GitHub.
+## Deploy
 
-## Деплой через GitHub
+1. Push the project to GitHub.
+2. In Render, create a new Blueprint.
+3. Select the GitHub repository.
+4. Render reads `render.yaml`.
+5. Fill in variables marked with `sync: false`.
+6. Apply the Blueprint.
 
-1. Создай GitHub-репозиторий для папки `clean_clinic_bot`.
-2. Загрузи туда файлы проекта.
-3. В Render нажми `New` -> `Blueprint`.
-4. Выбери GitHub-репозиторий.
-5. Render прочитает `render.yaml`.
-6. Введи секретные переменные, которые помечены `sync: false`.
-7. Нажми `Apply`.
+## Check
 
-## Проверка
+1. Open Render logs.
+2. Confirm `Application started`.
+3. Send `/start` to the bot.
+4. Complete the test and submit a lead.
+5. Check the `Лиды` worksheet in Google Sheets.
 
-1. После успешного deploy открой Logs в Render.
-2. Должна быть строка `Application started`.
-3. Напиши боту `/start`.
-4. Пройди тест и оставь заявку.
-5. Проверь вкладку `Лиды` в Google Sheets. Новые заявки должны появляться со статусом `Новая заявка`.
-
-## Локальный бот
-
-После запуска на Render не держи локально `python bot.py`, иначе два процесса будут одновременно читать Telegram updates.
+After Render is running, stop any local `python bot.py` process to avoid duplicate polling.
