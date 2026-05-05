@@ -36,6 +36,20 @@ GOOGLE_SERVICE_ACCOUNT_FILE=/полный/путь/к/service-account.json
 python format_sheet.py
 ```
 
+## QR-код
+
+QR-код ведет на Telegram-бота:
+
+```text
+https://t.me/Tests2609bot
+```
+
+Чтобы заново сгенерировать PNG:
+
+```bash
+python generate_qr.py
+```
+
 Для сервера удобнее использовать переменную одной строкой:
 
 ```env

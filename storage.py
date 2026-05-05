@@ -137,3 +137,72 @@ def save_lead(user_data: dict, user) -> Path:
     except Exception:
         logger.exception("Failed to save lead to Google Sheets")
     return path
+
+
+def get_lead_stats() -> dict:
+    values = _get_google_sheet_values()
+    if not values:
+        return {
+            "total": 0,
+            "new": 0,
+            "in_progress": 0,
+            "no_answer": 0,
+            "booked": 0,
+            "refused": 0,
+            "closed": 0,
+            "conversion": 0,
+            "avg_score": 0,
+            "avg_energy": 0,
+        }
+
+    headers = values[0]
+    rows = [row for row in values[1:] if row and row[0]]
+    status_idx = headers.index("Статус") if "Статус" in headers else 2
+    score_idx = headers.index("Балл") if "Балл" in headers else 12
+    energy_idx = headers.index("Энергия, %") if "Энергия, %" in headers else 14
+
+    def cell(row: list, idx: int) -> str:
+        return row[idx] if idx < len(row) else ""
+
+    total = len(rows)
+    statuses = [cell(row, status_idx) for row in rows]
+    booked = statuses.count("Записан на консультацию")
+    scores = [_to_float(cell(row, score_idx)) for row in rows if cell(row, score_idx)]
+    energies = [_to_float(cell(row, energy_idx)) for row in rows if cell(row, energy_idx)]
+
+    return {
+        "total": total,
+        "new": statuses.count("Новая заявка"),
+        "in_progress": statuses.count("В работе"),
+        "no_answer": statuses.count("Не дозвонились"),
+        "booked": booked,
+        "refused": statuses.count("Отказ"),
+        "closed": statuses.count("Закрыта"),
+        "conversion": (booked / total * 100) if total else 0,
+        "avg_score": sum(scores) / len(scores) if scores else 0,
+        "avg_energy": sum(energies) / len(energies) if energies else 0,
+    }
+
+
+def _get_google_sheet_values() -> list:
+    if not GOOGLE_SHEET_ID or not (GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_FILE):
+        return []
+
+    import gspread
+
+    if GOOGLE_SERVICE_ACCOUNT_JSON:
+        credentials = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
+    else:
+        credentials = json.loads(Path(GOOGLE_SERVICE_ACCOUNT_FILE).read_text(encoding="utf-8"))
+
+    client = gspread.service_account_from_dict(credentials)
+    spreadsheet = client.open_by_key(GOOGLE_SHEET_ID)
+    worksheet = spreadsheet.worksheet(GOOGLE_SHEET_NAME)
+    return worksheet.get_all_values()
+
+
+def _to_float(value: str) -> float:
+    try:
+        return float(str(value).replace(",", "."))
+    except ValueError:
+        return 0
