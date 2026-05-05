@@ -32,10 +32,10 @@ ADMIN_CHAT_IDS=5524476590,111111111,222222222
 
 ## Как получить GOOGLE_SERVICE_ACCOUNT_JSON одной строкой
 
-На локальном компьютере из папки проекта выполни:
+На локальном компьютере выполни команду, заменив путь на путь к скачанному JSON-ключу:
 
 ```bash
-python3 -c "import json; print(json.dumps(json.load(open('/Users/magomed199/Downloads/arcane-geode-495219-k3-bf2fd0ce1fcd.json'))))"
+python3 -c "import json; print(json.dumps(json.load(open('/path/to/service-account.json'))))"
 ```
 
 Скопируй весь вывод и вставь в Render как значение `GOOGLE_SERVICE_ACCOUNT_JSON`.

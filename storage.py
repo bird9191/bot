@@ -75,7 +75,12 @@ def _build_row(user_data: dict, user) -> dict:
 
 
 def _save_to_csv(row: dict) -> Path:
-    file_exists = LEADS_PATH.exists()
+    file_exists = LEADS_PATH.exists() and LEADS_PATH.stat().st_size > 0
+    if file_exists:
+        with LEADS_PATH.open("r", newline="", encoding="utf-8") as f:
+            first_row = next(csv.reader(f), [])
+        file_exists = first_row == FIELDNAMES
+
     with LEADS_PATH.open("a", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         if not file_exists:
@@ -91,13 +96,7 @@ def _save_to_google_sheet(row: dict) -> None:
 
     import gspread
 
-    if GOOGLE_SERVICE_ACCOUNT_JSON:
-        credentials = json.loads(GOOGLE_SERVICE_ACCOUNT_JSON)
-    else:
-        credentials = json.loads(Path(GOOGLE_SERVICE_ACCOUNT_FILE).read_text(encoding="utf-8"))
-
-    client = gspread.service_account_from_dict(credentials)
-    spreadsheet = client.open_by_key(GOOGLE_SHEET_ID)
+    spreadsheet = _open_spreadsheet()
 
     try:
         worksheet = spreadsheet.worksheet(GOOGLE_SHEET_NAME)
@@ -188,6 +187,12 @@ def _get_google_sheet_values() -> list:
     if not GOOGLE_SHEET_ID or not (GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_FILE):
         return []
 
+    spreadsheet = _open_spreadsheet()
+    worksheet = spreadsheet.worksheet(GOOGLE_SHEET_NAME)
+    return worksheet.get_all_values()
+
+
+def _open_spreadsheet():
     import gspread
 
     if GOOGLE_SERVICE_ACCOUNT_JSON:
@@ -196,9 +201,7 @@ def _get_google_sheet_values() -> list:
         credentials = json.loads(Path(GOOGLE_SERVICE_ACCOUNT_FILE).read_text(encoding="utf-8"))
 
     client = gspread.service_account_from_dict(credentials)
-    spreadsheet = client.open_by_key(GOOGLE_SHEET_ID)
-    worksheet = spreadsheet.worksheet(GOOGLE_SHEET_NAME)
-    return worksheet.get_all_values()
+    return client.open_by_key(GOOGLE_SHEET_ID)
 
 
 def _to_float(value: str) -> float:

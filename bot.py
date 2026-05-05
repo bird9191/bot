@@ -2,8 +2,8 @@ import logging
 from telegram import Update
 from telegram.ext import (
     Application,
-    CommandHandler,
     CallbackQueryHandler,
+    CommandHandler,
     MessageHandler,
     ConversationHandler,
     filters,
@@ -11,7 +11,6 @@ from telegram.ext import (
 )
 from config import ADMIN_CHAT_IDS, BOT_TOKEN, QUIZ, COLLECT_NAME, COLLECT_PHONE, COLLECT_CONCERN, COLLECT_TIME
 from handlers.quiz import cmd_start, handle_start_quiz, handle_answer, cmd_cancel
-from handlers.result import show_result
 from handlers.form import handle_get_plan, collect_name, collect_phone, collect_concern, collect_time
 from storage import get_lead_stats
 
@@ -97,9 +96,9 @@ def main() -> None:
         allow_reentry=True,
     )
 
-    app.add_handler(conv)
     app.add_handler(CommandHandler("id", cmd_id))
     app.add_handler(CommandHandler("stats", cmd_stats))
+    app.add_handler(conv)
     app.run_polling(drop_pending_updates=True)
 
 

@@ -43,8 +43,6 @@ async def handle_start_quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 
 async def handle_answer(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    from handlers.result import show_result
-
     query = update.callback_query
     await query.answer()
 
