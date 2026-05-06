@@ -10,6 +10,7 @@ from config import (
     GOOGLE_SHEET_ID,
     GOOGLE_SHEET_NAME,
 )
+from db import create_quiz_session, get_stats as get_db_stats, is_configured as is_db_configured, save_completed_lead
 
 
 LEADS_PATH = Path(__file__).with_name("leads.csv")
@@ -132,13 +133,29 @@ def save_lead(user_data: dict, user) -> Path:
     row = _build_row(user_data, user)
     path = _save_to_csv(row)
     try:
+        save_completed_lead(user_data, user, row, SOURCE_TAG)
+    except Exception:
+        logger.exception("Failed to save lead to PostgreSQL")
+    try:
         _save_to_google_sheet(row)
     except Exception:
         logger.exception("Failed to save lead to Google Sheets")
     return path
 
 
+def start_quiz_session(user_data: dict, user) -> None:
+    session_id = create_quiz_session(user, SOURCE_TAG)
+    if session_id:
+        user_data["db_session_id"] = session_id
+
+
 def get_lead_stats() -> dict:
+    if is_db_configured():
+        try:
+            return get_db_stats()
+        except Exception:
+            logger.exception("Failed to load lead stats from PostgreSQL")
+
     values = _get_google_sheet_values()
     if not values:
         return {

@@ -4,6 +4,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 from config import QUIZ, COLLECT_NAME
 from data import QUESTIONS
 from keyboards import kb_start, kb_question
+from storage import start_quiz_session
 
 
 def _question_text(q_idx: int) -> str:
@@ -18,6 +19,7 @@ def _question_text(q_idx: int) -> str:
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data.clear()
     context.user_data.update({"answers": [], "score": 0, "multi_sel": []})
+    start_quiz_session(context.user_data, update.effective_user)
     await update.message.reply_text(
         "🏥 *Clean Clinic*\n\n"
         "*Проверь уровень энергии за 60 секунд*\n\n"
